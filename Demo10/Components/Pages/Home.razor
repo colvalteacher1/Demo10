@@ -1,0 +1,39 @@
+﻿@page "/"
+@inject IHttpClientFactory HttpClientFactory
+
+<PageTitle>Clients</PageTitle>
+
+<h1>Liste des clients en cours</h1>
+
+@if(customers != null)
+{
+    <ul>
+        @foreach (var customer in customers)
+        {
+            <li>@customer.CustomerName</li>
+        }
+    </ul>
+}
+
+
+@code{
+    private List<Customer>? customers;
+    protected override async Task OnInitializedAsync()
+    {
+        var httpClient = HttpClientFactory.CreateClient("ApiClient");
+
+        customers = await httpClient.GetFromJsonAsync<List<Customer>>("api/customers/all");
+    }
+
+
+    class Customer
+    {
+        public int CustomerId { get; set; }
+
+        public string? CustomerName { get; set; }
+
+        public string? City { get; set; }
+
+        public DateOnly? CreationDate { get; set; }
+    }
+}

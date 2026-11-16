@@ -1,4 +1,4 @@
-﻿@page "/customers"
+﻿@page "/customers/edit/{Id:int}"
 @inject IHttpClientFactory HttpClientFactory
 @using Dtos
 @inject NavigationManager Nav
@@ -7,9 +7,9 @@
 
 <div class="container w-75 mx-auto">
     
-<h3 class="text-center text-primary">Formulair d'ajout d'un nouveau client</h3>
+<h3 class="text-center text-primary">Formulaire de mise à jour d'un client</h3>
 
-<EditForm Model="customer" OnValidSubmit="CreateCustomer" FormName="form-customer">
+<EditForm Model="customer" OnValidSubmit="EditCustomer" FormName="form-customer">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="mb-2">
@@ -30,21 +30,36 @@
         <ValidationMessage For="() => customer.CreationDate" />
     </div>
 
-    <button class="btn btn-primary me-2" type="submit">Créer</button>
+    <button class="btn btn-primary me-2" type="submit">Modifier</button>
+    <button class="btn btn-outline-secondary me-2" type="button" @onclick="GoBack">Annuler</button>
 </EditForm>
 </div>
 @code {
-    private CustomerDto customer = new();
+    [Parameter] public int Id { get; set; }
 
-    private async Task CreateCustomer()
+    private CustomerDto customer = new();
+    
+    protected override async Task OnInitializedAsync()
     {
         var httpClient = HttpClientFactory.CreateClient("ApiClient");
 
-        var response = await httpClient.PostAsJsonAsync("api/customers", customer);
+        customer = await httpClient.GetFromJsonAsync<CustomerDto>($"api/customers/one/{Id}");
+    }
+
+    private async Task EditCustomer()
+    {
+        var httpClient = HttpClientFactory.CreateClient("ApiClient");
+
+        var response = await httpClient.PutAsJsonAsync($"api/customers/{Id}", customer);
         if (response.IsSuccessStatusCode)
         {
             //rediriger vers la page d'accueil Home avec QueryString de confirmation
-            Nav.NavigateTo("/?confirmation=true");
+            Nav.NavigateTo("/?action=edit&confirmation=true");
         }
+    }
+    
+    private void GoBack()
+    {
+         Nav.NavigateTo("/");
     }
 }

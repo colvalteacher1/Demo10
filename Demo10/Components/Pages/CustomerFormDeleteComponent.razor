@@ -1,0 +1,65 @@
+﻿@page "/customers/delete/{Id:int}"
+@inject IHttpClientFactory HttpClientFactory
+@using Dtos
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+
+<div class="container w-75 mx-auto">
+    
+<h3 class="text-center text-primary">Confirmation de la suppression d'un client</h3>
+
+<EditForm Model="customer" OnValidSubmit="DeleteCustomer" FormName="form-customer">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-2">
+        <label class="form-label">Nom</label>
+        <InputText readonly class="form-control" @bind-Value="customer.CustomerName" />
+        <ValidationMessage For="() => customer.CustomerName" />
+    </div>
+
+     <div class="mb-2">
+        <label class="form-label">City</label>
+        <InputText readonly class="form-control" @bind-Value="customer.City" />
+        <ValidationMessage For="() => customer.City" />
+    </div>
+
+     <div class="mb-2">
+        <label class="form-label">Date de création</label>
+        <InputDate readonly class="form-control" @bind-Value="customer.CreationDate" />
+        <ValidationMessage For="() => customer.CreationDate" />
+    </div>
+
+    <button class="btn btn-primary me-2" type="submit">Supprimer</button>
+    <button class="btn btn-outline-secondary me-2" type="button" @onclick="GoBack">Annuler</button>
+</EditForm>
+</div>
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private CustomerDto customer = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var httpClient = HttpClientFactory.CreateClient("ApiClient");
+
+        customer = await httpClient.GetFromJsonAsync<CustomerDto>($"api/customers/one/{Id}");
+    }
+
+    private async Task DeleteCustomer()
+    {
+        var httpClient = HttpClientFactory.CreateClient("ApiClient");
+
+        var response = await httpClient.DeleteAsync($"api/customers/{Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            //rediriger vers la page d'accueil Home avec QueryString de confirmation
+            Nav.NavigateTo("/?action=delete&confirmation=true");
+        }
+    }
+
+    private void GoBack()
+    {
+         Nav.NavigateTo("/");
+    }
+}

@@ -8,13 +8,13 @@
 
 @if(confirmation)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-      <strong>Confirmation</strong> Client ajouté avec succès.
+    <div class="alert @style alert-dismissible fade show" role="alert">
+      <strong>Confirmation</strong> @message
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<a href="/customers" class="btn btn-success m-5">Ajouter</a>
+<a href="/customers/create" class="btn btn-success m-5">Ajouter</a>
 
 
 <h1 class="display-3 text-center text-primary">Liste des clients en cours</h1>
@@ -26,6 +26,8 @@
         {
             <li class="list-group-item">@customer.CustomerName
                 <a href="/customers/@customer.CustomerId" class="btn btn-outline-primary">Details</a>
+                <a href="/customers/edit/@customer.CustomerId" class="btn btn-outline-primary">Modifier</a>
+                <a href="/customers/delete/@customer.CustomerId" class="btn btn-outline-primary">Supprimer</a>
             </li>
         }
     </ul>
@@ -33,12 +35,34 @@
 
 
 @code{
+    [SupplyParameterFromQuery(Name = "action")]
+    public string action { get; set; }
+
     [SupplyParameterFromQuery(Name = "confirmation")]
     public bool confirmation { get; set; }
+
+    private string message = "";
+    private string style = "";
 
     private List<CustomerDto>? customers;
     protected override async Task OnInitializedAsync()
     {
+        if(action == "create")
+        {
+            message = "Client ajouté avec succès.";
+            style = "alert-success";
+        }
+        else if (action == "edit")
+        {
+            message = "Client mis à jour avec succès.";
+            style = "alert-primary";
+        }
+        else if(action == "delete")
+        {
+            message = "Client supprimé avec succès.";
+            style = "alert-danger";
+        } 
+
         var httpClient = HttpClientFactory.CreateClient("ApiClient");
 
         customers = await httpClient.GetFromJsonAsync<List<CustomerDto>>("api/customers/all");

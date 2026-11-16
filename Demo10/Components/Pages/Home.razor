@@ -1,8 +1,18 @@
 ﻿@page "/"
+
 @inject IHttpClientFactory HttpClientFactory
 @using Dtos
 
 <PageTitle>Clients</PageTitle>
+
+
+@if(confirmation)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>Confirmation</strong> Client ajouté avec succès.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <a href="/customers" class="btn btn-success m-5">Ajouter</a>
 
@@ -23,6 +33,9 @@
 
 
 @code{
+    [SupplyParameterFromQuery(Name = "confirmation")]
+    public bool confirmation { get; set; }
+
     private List<CustomerDto>? customers;
     protected override async Task OnInitializedAsync()
     {

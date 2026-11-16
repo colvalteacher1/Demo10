@@ -43,8 +43,8 @@
         var response = await httpClient.PostAsJsonAsync("api/customers", customer);
         if (response.IsSuccessStatusCode)
         {
-            //rediriger vers la page d'accueil Home
-            Nav.NavigateTo("/");
+            //rediriger vers la page d'accueil Home avec QueryString de confirmation
+            Nav.NavigateTo("/?confirmation=true");
         }
     }
 }

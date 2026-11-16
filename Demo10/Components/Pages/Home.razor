@@ -1,39 +1,33 @@
 ﻿@page "/"
 @inject IHttpClientFactory HttpClientFactory
+@using Dtos
 
 <PageTitle>Clients</PageTitle>
 
-<h1>Liste des clients en cours</h1>
+<a href="/customers" class="btn btn-success m-5">Ajouter</a>
+
+
+<h1 class="display-3 text-center text-primary">Liste des clients en cours</h1>
 
 @if(customers != null)
 {
-    <ul>
+    <ul class="list-group w-75 mx-auto">
         @foreach (var customer in customers)
         {
-            <li>@customer.CustomerName</li>
+            <li class="list-group-item">@customer.CustomerName
+                <a href="/customers/@customer.CustomerId" class="btn btn-outline-primary">Details</a>
+            </li>
         }
     </ul>
 }
 
 
 @code{
-    private List<Customer>? customers;
+    private List<CustomerDto>? customers;
     protected override async Task OnInitializedAsync()
     {
         var httpClient = HttpClientFactory.CreateClient("ApiClient");
 
-        customers = await httpClient.GetFromJsonAsync<List<Customer>>("api/customers/all");
-    }
-
-
-    class Customer
-    {
-        public int CustomerId { get; set; }
-
-        public string? CustomerName { get; set; }
-
-        public string? City { get; set; }
-
-        public DateOnly? CreationDate { get; set; }
+        customers = await httpClient.GetFromJsonAsync<List<CustomerDto>>("api/customers/all");
     }
 }

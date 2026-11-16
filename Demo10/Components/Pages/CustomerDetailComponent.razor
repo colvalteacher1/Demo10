@@ -1,0 +1,29 @@
+﻿@page "/customers/{Id:int}"
+@inject IHttpClientFactory HttpClientFactory
+@using Dtos
+
+
+@if(customer != null)
+{
+    <h1 class="text-center display-3 text-warning">@customer.CustomerName</h1>
+    <ul class="list-group">
+        <li class="list-group-item">@customer.City</li>
+        <li class="list-group-item">@customer.CreationDate</li>
+        
+    </ul>
+   
+}
+
+@code{
+
+    [Parameter] public int Id { get; set; }
+    private CustomerDto customer;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var httpClient = HttpClientFactory.CreateClient("ApiClient");
+
+        customer = await httpClient.GetFromJsonAsync<CustomerDto>($"api/customers/one/{Id}");
+    }
+
+}

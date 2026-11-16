@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //injection de service HttpClient
 var apiBase = builder.Configuration["ApiBaseUrl"]
-              ?? "https://localhost:7279/";
+              ?? "https://localhost:7000/";
 
 builder.Services.AddHttpClient("ApiClient", client =>
 {
